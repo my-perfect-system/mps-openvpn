@@ -17,6 +17,25 @@ services:
     networks:
       vpn-net:
         ipv4_address: 172.20.0.2
+  client:
+    build: ./client
+    depends_on: 
+      - server
+    container_name: openvpn-client
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      CLIENT_NAME: client1
+      NETWORKS: example-tap
+    restart: unless-stopped
+    volumes:
+      - ./networks:/etc/openvpn/networks:ro
+      - server-log:/var/log
+    networks:
+      vpn-net:
+        ipv4_address: 172.20.0.5
 
 volumes:
   server-log:

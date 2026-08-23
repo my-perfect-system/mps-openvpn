@@ -20,11 +20,9 @@ start_connections() {
 
 mkdir -p /var/log
 CLIENT_NAME="${CLIENT_NAME:-}" NETWORKS="${NETWORKS:-}"
-
 [ -z "$CLIENT_NAME" ] || [ -z "$NETWORKS" ] && { echo "CLIENT_NAME and NETWORKS env vars must be set."; exit 1; }
 
-found=$(start_connections "$CLIENT_NAME" "$NETWORKS")
-[ "$found" -eq 0 ] && { echo "No valid client configs found."; exit 1; }
+start_connections "$CLIENT_NAME" "$NETWORKS"
 
 trap 'kill $(jobs -p); exit 0' INT TERM
 wait
