@@ -6,7 +6,6 @@ load_env() {
   local ENV_FILE="$COMMON_DIR/../.env"
   if [ -f "$ENV_FILE" ]; then source "$ENV_FILE"; fi
   SERVER_ADDRESS="${SERVER_ADDRESS:-server}"
-  TAP_BASE_IP="${TAP_BASE_IP:-192.168.0.1}"
 }
 
 ensure_client_cert() {
@@ -95,49 +94,22 @@ setup_client_for_network() {
 
 if [ $# -lt 2 ]; then echo "Usage: $0 <client-name> <network[=ip]> [network[=ip] ...]"; exit 1; fi
 
-CLIENT="$1"
-shift
-
-NET_NAMES=()
-declare -A NET_IPS
-
-# Convert an IPv4 address to an integer
-ip_to_int() {
-    IFS=. read -r a b c d <<< "$1"
-    echo $(( (a << 24) + (b << 16) + (c << 8) + d ))
-}
-
-# Convert an integer back to an IPv4 address
-int_to_ip() {
-    local ip=$1
-    echo "$(( (ip >> 24) & 255 )).$(( (ip >> 16) & 255 )).$(( (ip >> 8) & 255 )).$(( ip & 255 ))"
-}
-
+CLIENT="$1"; shift
+NET_NAMES=(); declare -A NET_IPS
+for arg in "$@"; do
+  if [[ "$arg" == *=* ]]; then
+    name="${arg%%=*}"; ip="${arg#*=}"
+    NET_IPS["$name"]="$ip"; NET_NAMES+=("$name")
+  else
+    NET_NAMES+=("$arg")
+  fi
+done
 COMMON_DIR="$(cd "$(dirname "$0")" && pwd)"
 EASYRSA_DIR="$COMMON_DIR/easy-rsa"
 PKI_DIR="$EASYRSA_DIR/pki"
 PROJECT_DIR="$COMMON_DIR/.."
 
 load_env "$COMMON_DIR"
-NEXT_IP=$(ip_to_int "$TAP_BASE_IP")
-
-for arg in "$@"; do
-    if [[ "$arg" == *=* ]]; then
-        name="${arg%%=*}"
-        ip="${arg#*=}"
-
-        NET_IPS["$name"]="$ip"
-        NET_NAMES+=("$name")
-    else
-        name="$arg"
-
-        ip=$(int_to_ip "$NEXT_IP")
-        NET_IPS["$name"]="$ip"
-        NET_NAMES+=("$name")
-
-        ((NEXT_IP++))
-    fi
-done
 source "$COMMON_DIR/download-easyrsa.sh"
 if [ ! -f "$PKI_DIR/ca.crt" ]; then echo "CA not found. Run gen-certs.sh first."; exit 1; fi
 
