@@ -113,6 +113,12 @@ int_to_ip() {
     echo "$(( (ip >> 24) & 255 )).$(( (ip >> 16) & 255 )).$(( (ip >> 8) & 255 )).$(( ip & 255 ))"
 }
 
+COMMON_DIR="$(cd "$(dirname "$0")" && pwd)"
+EASYRSA_DIR="$COMMON_DIR/easy-rsa"
+PKI_DIR="$EASYRSA_DIR/pki"
+PROJECT_DIR="$COMMON_DIR/.."
+
+load_env "$COMMON_DIR"
 NEXT_IP=$(ip_to_int "$TAP_BASE_IP")
 
 for arg in "$@"; do
@@ -132,12 +138,6 @@ for arg in "$@"; do
         ((NEXT_IP++))
     fi
 done
-COMMON_DIR="$(cd "$(dirname "$0")" && pwd)"
-EASYRSA_DIR="$COMMON_DIR/easy-rsa"
-PKI_DIR="$EASYRSA_DIR/pki"
-PROJECT_DIR="$COMMON_DIR/.."
-
-load_env "$COMMON_DIR"
 source "$COMMON_DIR/download-easyrsa.sh"
 if [ ! -f "$PKI_DIR/ca.crt" ]; then echo "CA not found. Run gen-certs.sh first."; exit 1; fi
 
