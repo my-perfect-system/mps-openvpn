@@ -95,6 +95,7 @@ persist-key
 persist-tun
 client-to-client
 duplicate-cn
+status-version 3
 status /var/log/${NAME}-status.log
 log-append /var/log/${NAME}.log
 verb 3

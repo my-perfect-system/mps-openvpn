@@ -63,7 +63,9 @@ listed network:
 1. Creates a CCD whitelist marker at
    `networks/<network>/ccd/<name>`
 2. Generates a self-contained `.ovpn` file at
-   `networks/<network>/clients/<name>.ovpn` with inline PEMs
+   `networks/<network>/clients/<name>.ovpn` with inline PEMs, plus
+   `status-version 3` and an explicit
+   `status /var/log/<network>-client-status.log` directive
 3. Packages the archive
    `common/clients/<name>/<name>.tar.gz` containing `.ovpn` files,
    raw certs, and `install-debian.sh`

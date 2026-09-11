@@ -44,6 +44,7 @@ write_ccd_marker() {
 
 write_ovpn() {
   local NET_DIR="$1" PKI_DIR="$2" CLIENT="$3" SERVER_ADDRESS="$4"
+  local NAME=$(basename "$NET_DIR")
   local PORT=$(grep '^port ' "$NET_DIR/server.conf" | awk '{print $2}')
   local MODE=$(grep '^dev ' "$NET_DIR/server.conf" | awk '{print $2}')
   local OVPN="$NET_DIR/clients/$CLIENT.ovpn"
@@ -62,6 +63,8 @@ auth SHA256
 persist-key
 persist-tun
 verb 3
+status-version 3
+status /var/log/${NAME}-client-status.log
 <ca>
 $(cat "$NET_DIR/ca.crt")
 </ca>

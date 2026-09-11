@@ -96,6 +96,13 @@ Each network writes a status file. Check connected clients:
 docker exec openvpn-server cat /var/log/<name>-status.log
 ```
 
+Each client connection also writes its own status file (a distinct
+name, so the shared log volume does not collide with the server's):
+
+```
+docker exec openvpn-client cat /var/log/<name>-client-status.log
+```
+
 For real-time OpenVPN logs:
 
 ```

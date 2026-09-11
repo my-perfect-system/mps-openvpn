@@ -162,6 +162,9 @@ networks/               — (gitignored, regeneratable)
 - Copies raw cert/key/ca.crt to `common/clients/<name>/`.
 - Generates inline `.ovpn` with embedded PEMs (cert, key, ca,
   tls-crypt).
+- `.ovpn` always sets `status-version 3` and
+  `status /var/log/<network>-client-status.log` explicitly (server
+  configs likewise set `status-version 3` and their own status path).
 - Creates client archive at `common/clients/<name>/<name>.tar.gz`
   containing:
   - `<network>.ovpn` (one per network)
@@ -205,6 +208,12 @@ networks/               — (gitignored, regeneratable)
 Each network writes a status file:
 ```
 docker exec openvpn-server cat /var/log/<name>-status.log
+```
+
+Each client connection writes one too (distinct name so the shared
+`server-log` volume does not collide with the server's):
+```
+docker exec openvpn-client cat /var/log/<name>-client-status.log
 ```
 
 For real-time OpenVPN logs:
